@@ -2,23 +2,15 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="乐跑">
-    
-    <title>乐跑</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>乐跑 - 个人中心</title>
     <style>
         :root {
-            --app-bg: #ffffff;
-            --card-light-green: #dcfadc;
-            --stats-dark-green: #446545;
-            --text-main: #333333;
+            --bg-color: #f7f8fa;
+            --text-main: #111111;
             --text-sub: #999999;
-            --icon-border: #4a6649;
-            --tab-active: #3fb671;
-            --tab-inactive: #9aa89a;
+            --card-green: #2fb968; /* 原版卡片绿色 */
+            --line-color: #f0f0f0;
         }
 
         * {
@@ -30,7 +22,7 @@
         }
 
         body {
-            background-color: #000;
+            background-color: #333;
             display: flex;
             justify-content: center;
             height: 100vh;
@@ -41,11 +33,9 @@
             width: 100%;
             max-width: 414px;
             height: 100%;
-            background-color: var(--app-bg);
+            background-color: var(--bg-color);
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
         .screen {
@@ -54,276 +44,347 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--app-bg);
             display: none;
             flex-direction: column;
-            z-index: 1;
+            overflow-y: auto;
         }
 
         .screen.active {
             display: flex;
-            animation: fadeIn 0.2s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(10px); }
-            to { opacity: 1; transform: translateX(0); }
+        /* ================= 页面：我的 ================= */
+        .header-area {
+            background: #ffffff;
+            padding-bottom: 15px;
         }
 
-        /* ================= 页面1：我的 ================= */
-        .page-scroll {
-            flex: 1;
-            overflow-y: auto;
-            /* 底部留出导航栏高度 + 苹果底部小白条的安全距离 */
-            padding-bottom: calc(80px + env(safe-area-inset-bottom)); 
-        }
-
-        .top-header {
+        .nav-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: calc(20px + env(safe-area-inset-top)) 25px 15px;
-            font-size: 20px;
+            padding: 15px 20px;
+            font-size: 18px;
             font-weight: 500;
-            background: var(--app-bg);
+            color: var(--text-main);
         }
-
-        .gear-icon { width: 24px; height: 24px; fill: #666; }
-
-        .main-green-card {
-            background-color: var(--card-light-green);
-            border-radius: 25px 25px 0 0;
-            margin: 0 15px;
-            padding: 25px 20px;
-            min-height: calc(100vh - 150px);
-        }
+        
+        .nav-icon svg { width: 22px; height: 22px; fill: #666; }
 
         .user-profile {
             display: flex;
             align-items: center;
-            margin-bottom: 25px;
+            padding: 5px 20px 20px;
         }
 
-        .avatar-box {
-            width: 70px;
-            height: 70px;
-            background: #e1e3de;
+        .avatar {
+            width: 65px;
+            height: 65px;
+            background: #e9ece6;
             border-radius: 50%;
-            border: 2px solid var(--text-main);
+            border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 35px;
-            margin-right: 15px;
+            font-size: 32px;
+            overflow: hidden;
         }
+        
+        /* 如果有真实头像链接，替换这里的 src */
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-        .user-info .name-row {
-            font-size: 18px;
+        .user-info { margin-left: 15px; flex: 1; }
+        
+        .user-name {
+            font-size: 20px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
-        .name-row svg { width: 14px; height: 14px; fill: var(--text-main); margin-left: auto; }
+        .user-name svg { width: 14px; height: 14px; fill: #999; margin-left: 5px; }
 
-        .user-info .id-row {
-            font-size: 13px;
-            color: #7ba385;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-        }
-        .id-row svg { width: 14px; height: 14px; fill: #7ba385; margin-left: 6px; }
+        .user-id { font-size: 13px; color: var(--text-sub); display: flex; align-items: center; }
+        .user-id svg { width: 12px; height: 12px; fill: #999; margin-left: 6px; }
 
-        .dotted-line {
-            border-top: 4px dotted #213522;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        .stats-dark-bar {
-            background-color: var(--stats-dark-green);
-            border-radius: 6px;
-            display: flex;
-            padding: 16px 5px;
+        /* 原版绿色数据卡片 */
+        .green-stats-card {
+            background: var(--card-green);
+            margin: 0 20px;
+            border-radius: 12px;
             color: #ffffff;
-            text-align: center;
-            margin-bottom: 15px;
-            margin-left: -5px;
-            margin-right: -5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .stat-item { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .stat-val { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-        .stat-label { font-size: 12px; color: rgba(255, 255, 255, 0.85); }
-
-        .auth-banner {
-            background: linear-gradient(108deg, #94ce9a 48%, #72a576 48%);
-            border-radius: 6px;
-            padding: 18px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #ffffff;
-            margin-bottom: 25px;
-            margin-left: -5px;
-            margin-right: -5px;
-            cursor: pointer;
-        }
-
-        .auth-left { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500;}
-        .auth-icon { width: 20px; height: 20px; stroke: #fff; stroke-width: 2; fill: none;}
-        
-        .auth-right { text-align: right; }
-        .auth-status { font-size: 14px; margin-bottom: 3px; }
-        .auth-number { font-size: 12px; opacity: 0.9; }
-
-        .grid-menu { display: flex; justify-content: space-between; margin-bottom: 30px; padding: 0 10px; }
-        .grid-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .grid-icon { width: 50px; height: 50px; background: #caebd0; border: 2px solid var(--icon-border); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
-        .grid-icon svg { width: 30px; height: 30px; fill: var(--icon-border); }
-        .grid-label { font-size: 13px; color: var(--text-main); font-weight: 500;}
-
-        .thin-line { height: 1px; background: #c0dcc3; margin-bottom: 10px; }
-
-        .list-menu { padding: 0 5px; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
-        .list-left { display: flex; align-items: center; gap: 12px; font-size: 16px; color: var(--text-main); font-weight: 500;}
-        .list-left svg { width: 24px; height: 24px; fill: var(--icon-border); }
-        .list-arrow { width: 24px; height: 24px; background: #8ec396; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .list-arrow svg { width: 14px; height: 14px; fill: #ffffff; }
-
-        /* 底部导航栏适配苹果小白条 */
-        .bottom-tab-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: calc(65px + env(safe-area-inset-bottom));
-            background: #ffffff;
-            display: flex;
-            justify-content: space-around;
-            padding-top: 10px;
-            padding-bottom: env(safe-area-inset-bottom);
-            border-top: 1px solid #f0f0f0;
-            z-index: 10;
-        }
-
-        .tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--tab-inactive); }
-        .tab-item svg { width: 28px; height: 28px; fill: var(--tab-inactive); }
-        .tab-item.active { color: var(--tab-active); }
-        .tab-item.active svg { fill: var(--tab-active); }
-        .tab-label { font-size: 11px; font-weight: 500; }
-
-        /* ================= 页面2：身份认证 ================= */
-        .auth-nav-header {
-            display: flex;
-            align-items: center;
-            padding: calc(15px + env(safe-area-inset-top)) 20px 15px;
-            background: #ffffff;
-            border-bottom: 1px solid #f5f5f5;
+            padding: 20px 10px;
+            box-shadow: 0 4px 10px rgba(47, 185, 104, 0.2);
             position: relative;
         }
 
-        .back-btn { display: flex; align-items: center; font-size: 20px; color: #666; cursor: pointer; z-index: 10; padding: 5px; margin-left: -5px;}
-        .auth-title-center { position: absolute; left: 0; right: 0; text-align: center; font-size: 18px; font-weight: 600; color: #000; top: calc(15px + env(safe-area-inset-top));}
+        .dotted-line {
+            border-top: 3px dotted rgba(255, 255, 255, 0.4);
+            margin-bottom: 15px;
+            width: 100%;
+        }
 
-        .role-selector-box { background: #ffffff; padding: 30px 20px 20px; display: flex; align-items: center; }
-        .role-label-text { font-size: 16px; color: #333; margin-right: 50px; font-weight: 500;}
-        .role-options-flex { display: flex; gap: 40px; }
-        .role-btn { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .role-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .role-btn.active .role-circle { background: #00a862; }
-        .role-btn.active .role-circle svg { fill: #ffffff; width: 35px; height: 35px;}
-        .role-btn.active .role-text-label { color: #00a862; font-weight: 500; }
-        .role-btn.inactive .role-circle { border: 1px solid #e0e0e0; background: #ffffff; }
-        .role-btn.inactive .role-circle svg { fill: #dcdcdc; width: 35px; height: 35px;}
-        .role-btn.inactive .role-text-label { color: #dcdcdc; }
+        .stats-grid { display: flex; text-align: center; }
+        
+        .stat-item { flex: 1; }
+        
+        .stat-val { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .stat-val.large { font-size: 24px; }
+        .stat-label { font-size: 12px; color: rgba(255, 255, 255, 0.8); }
 
-        .details-list-wrap { background: #ffffff; padding: 0 20px; }
-        .detail-row { display: flex; padding: 20px 0; border-bottom: 1px solid #f2f2f2; font-size: 15px; }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-lbl { width: 100px; color: #333; font-weight: 500;}
-        .detail-val { flex: 1; text-align: right; color: #999; }
+        /* 认证条 */
+        .auth-banner {
+            margin: 15px 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .auth-left { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; }
+        .auth-icon { width: 20px; height: 20px; }
+        
+        .auth-right { text-align: right; }
+        .auth-status { font-size: 13px; color: var(--card-green); margin-bottom: 2px; }
+        .auth-number { font-size: 12px; color: var(--text-sub); }
 
-        .bottom-btn-area { padding: 40px 20px; background: #ffffff; height: 100%; }
-        .cert-btn { width: 100%; background: #a5a5a5; color: #ffffff; font-size: 17px; font-weight: 500; padding: 15px 0; border-radius: 30px; border: none; }
+        /* 图标菜单 */
+        .service-grid {
+            background: #ffffff;
+            display: flex;
+            padding: 20px 10px;
+            margin-bottom: 15px;
+        }
+        .service-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .service-icon {
+            width: 45px;
+            height: 45px;
+            background: #f0f7f3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .service-icon svg { width: 24px; height: 24px; fill: var(--card-green); }
+        .service-label { font-size: 12px; color: var(--text-main); }
+
+        /* 列表菜单 */
+        .list-menu { background: #ffffff; padding: 0 20px; }
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--line-color);
+            font-size: 15px;
+            color: var(--text-main);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-left { display: flex; align-items: center; gap: 10px; }
+        .list-left svg { width: 20px; height: 20px; fill: var(--card-green); }
+        
+        .arrow-circle {
+            width: 20px;
+            height: 20px;
+            background: #eaf5ee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .arrow-circle svg { width: 12px; height: 12px; fill: var(--card-green); }
+
+        /* ================= 页面：身份认证 ================= */
+        .auth-nav {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--line-color);
+            position: relative;
+        }
+        .back-btn { font-size: 16px; color: var(--text-main); display: flex; align-items: center; z-index: 10; cursor: pointer; }
+        .back-btn svg { width: 18px; height: 18px; margin-right: 4px; }
+        .auth-nav-title { position: absolute; left: 0; right: 0; text-align: center; font-size: 17px; font-weight: 500; }
+
+        .role-selector {
+            background: #ffffff;
+            padding: 30px 20px 40px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .role-label { font-size: 15px; margin-right: 40px; }
+        .role-options { display: flex; gap: 40px; }
+        .role-option { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .role-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .role-option.active .role-icon { background: var(--card-green); fill: #fff; }
+        .role-option.active .role-text { color: var(--card-green); font-weight: 500; }
+        .role-option.inactive .role-icon { border: 1px solid #ddd; fill: #ddd; }
+        .role-option.inactive .role-text { color: var(--text-sub); }
+        .role-text { font-size: 14px; }
+
+        .info-list { background: #ffffff; padding: 0 20px; }
+        .info-item { display: flex; padding: 18px 0; border-bottom: 1px solid var(--line-color); font-size: 15px; }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { width: 100px; color: var(--text-sub); }
+        .info-value { flex: 1; text-align: right; color: var(--text-main); }
+
+        .submit-btn-wrap { padding: 30px 20px; background: #ffffff; height: 100%; }
+        .submit-btn { width: 100%; background: #dcdcdc; color: #ffffff; font-size: 16px; padding: 14px 0; border-radius: 6px; border: none; }
     </style>
 </head>
 <body>
 
 <div id="app">
+
     <div id="page-profile" class="screen active">
-        <div class="top-header">
-            <div>我的</div>
-            <svg class="gear-icon" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
-        </div>
-        <div class="page-scroll">
-            <div class="main-green-card">
-                <div class="user-profile">
-                    <div class="avatar-box">🐧</div>
-                    <div class="user-info">
-                        <div class="name-row">鹿袁荣</div>
-                        <div class="id-row">ID: 18716221 <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></div>
+        
+        <div class="header-area">
+            <div class="nav-bar">
+                <div>我的</div>
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar">
+                    🐧
+                </div>
+                <div class="user-info">
+                    <div class="user-name">
+                        鹿袁荣
+                        <svg viewBox="0 0 24 24"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg>
                     </div>
-                    <svg style="margin-left: auto; width: 16px; height: 16px; fill: #111;" viewBox="0 0 24 24"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg>
+                    <div class="user-id">
+                        ID: 18716221
+                        <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                    </div>
                 </div>
+            </div>
+
+            <div class="green-stats-card">
                 <div class="dotted-line"></div>
-                <div class="stats-dark-bar">
-                    <div class="stat-item"><div class="stat-val">35</div><div class="stat-label">乐跑记录</div></div>
-                    <div class="stat-item"><div class="stat-val">999+</div><div class="stat-label">校园排行</div></div>
-                    <div class="stat-item"><div class="stat-val">0.00</div><div class="stat-label">荣誉证书</div></div>
-                    <div class="stat-item"><div class="stat-val">6500</div><div class="stat-label">积分兑换</div></div>
-                </div>
-                <div class="auth-banner" onclick="switchPage('page-auth')">
-                    <div class="auth-left"><svg class="auth-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path></svg> 身份认证</div>
-                    <div class="auth-right"><div class="auth-status">已认证学生</div><div class="auth-number">202515150121</div></div>
-                </div>
-                <div class="grid-menu">
-                    <div class="grid-item"><div class="grid-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg></div><div class="grid-label">我的消息</div></div>
-                    <div class="grid-item"><div class="grid-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5l-5-2.5 5-2.5 5 2.5-5 2.5zM2 12l10 5 10-5v5l-10 5-10-5v-5z"/></svg></div><div class="grid-label">我的等级</div></div>
-                    <div class="grid-item"><div class="grid-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm13-2h3v2h-3zm-3 0h2v2h-2zm3 3h3v2h-3zm-3 0h2v2h-2zm3 3h3v2h-3zm-3 0h2v2h-2z"/></svg></div><div class="grid-label">我的二维码</div></div>
-                    <div class="grid-item"><div class="grid-icon"><svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z"/></svg></div><div class="grid-label">帮助反馈</div></div>
-                </div>
-                <div class="thin-line"></div>
-                <div class="list-menu">
-                    <div class="list-item"><div class="list-left"><svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg> 设置行政班级</div><div class="list-arrow"><svg viewBox="0 0 24 24"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg></div></div>
-                    <div class="list-item"><div class="list-left"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.64-2.25 1.64-1.74 0-2.1-.96-2.15-1.92H8c.03 1.63 1.16 2.76 2.9 3.12V19h2.34v-1.6c1.47-.32 2.85-1.28 2.85-2.99 0-2.27-1.95-2.92-3.78-3.27z"/></svg> 设置体育班级</div><div class="list-arrow"><svg viewBox="0 0 24 24"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg></div></div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-val large">35</div>
+                        <div class="stat-label">乐跑记录</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">999+</div>
+                        <div class="stat-label">校园排行</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">0.00</div>
+                        <div class="stat-label">荣誉证书</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">6500</div>
+                        <div class="stat-label">积分兑换</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="bottom-tab-bar">
-            <div class="tab-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><span class="tab-label">动态</span></div>
-            <div class="tab-item"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg><span class="tab-label">校园</span></div>
-            <div class="tab-item"><svg viewBox="0 0 24 24"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg><span class="tab-label">乐跑</span></div>
-            <div class="tab-item"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg><span class="tab-label">活动</span></div>
-            <div class="tab-item active"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span class="tab-label">我的</span></div>
+
+        <div class="auth-banner" onclick="switchPage('page-auth')">
+            <div class="auth-left">
+                <svg class="auth-icon" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="11" stroke="#2fb968" stroke-width="2" fill="#e8f5e9"/>
+                    <path d="M7 12l3.5 3.5L17 8" stroke="#2fb968" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                身份认证
+            </div>
+            <div class="auth-right">
+                <div class="auth-status">已认证学生</div>
+                <div class="auth-number">202515150121</div>
+            </div>
+        </div>
+
+        <div class="service-grid">
+            <div class="service-item">
+                <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg></div>
+                <div class="service-label">我的消息</div>
+            </div>
+            <div class="service-item">
+                <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5l-5-2.5 5-2.5 5 2.5-5 2.5zM2 12l10 5 10-5v5l-10 5-10-5v-5z"/></svg></div>
+                <div class="service-label">我的等级</div>
+            </div>
+            <div class="service-item">
+                <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm13-2h3v2h-3zm-3 0h2v2h-2zm3 3h3v2h-3zm-3 0h2v2h-2zm3 3h3v2h-3zm-3 0h2v2h-2z"/></svg></div>
+                <div class="service-label">我的二维码</div>
+            </div>
+            <div class="service-item">
+                <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z"/></svg></div>
+                <div class="service-label">帮助反馈</div>
+            </div>
+        </div>
+
+        <div class="list-menu">
+            <div class="list-item">
+                <div class="list-left">
+                    <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                    设置行政班级
+                </div>
+                <div class="arrow-circle"><svg viewBox="0 0 24 24"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg></div>
+            </div>
+            <div class="list-item">
+                <div class="list-left">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.64-2.25 1.64-1.74 0-2.1-.96-2.15-1.92H8c.03 1.63 1.16 2.76 2.9 3.12V19h2.34v-1.6c1.47-.32 2.85-1.28 2.85-2.99 0-2.27-1.95-2.92-3.78-3.27z"/></svg>
+                    设置体育班级
+                </div>
+                <div class="arrow-circle"><svg viewBox="0 0 24 24"><path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z"/></svg></div>
+            </div>
         </div>
     </div>
 
     <div id="page-auth" class="screen">
-        <div class="auth-nav-header">
-            <div class="back-btn" onclick="switchPage('page-profile')">❮</div>
-            <div class="auth-title-center">身份认证</div>
+        <div class="auth-nav">
+            <div class="back-btn" onclick="switchPage('page-profile')">
+                <svg viewBox="0 0 24 24"><path d="M15.41,16.59L10.83,12l4.58-4.59L14,6l-6,6l6,6L15.41,16.59z"/></svg> 我的
+            </div>
+            <div class="auth-nav-title">身份认证</div>
         </div>
-        <div class="role-selector-box">
-            <div class="role-label-text">我是</div>
-            <div class="role-options-flex">
-                <div class="role-btn active"><div class="role-circle"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg></div><div class="role-text-label">学生</div></div>
-                <div class="role-btn inactive"><div class="role-circle"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="role-text-label">教职工</div></div>
+
+        <div class="role-selector">
+            <div class="role-label">我是</div>
+            <div class="role-options">
+                <div class="role-option active">
+                    <div class="role-icon">
+                        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                    </div>
+                    <div class="role-text">学生</div>
+                </div>
+                <div class="role-option inactive">
+                    <div class="role-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div class="role-text">教职工</div>
+                </div>
             </div>
         </div>
-        <div class="details-list-wrap">
-            <div class="detail-row"><div class="detail-lbl">学校</div><div class="detail-val">枣庄学院</div></div>
-            <div class="detail-row"><div class="detail-lbl">院系</div><div class="detail-val">机电工程学院</div></div>
-            <div class="detail-row"><div class="detail-lbl">姓名</div><div class="detail-val">鹿袁荣</div></div>
-            <div class="detail-row"><div class="detail-lbl">学号</div><div class="detail-val">202515150121</div></div>
-            <div class="detail-row"><div class="detail-lbl">性别</div><div class="detail-val">男</div></div>
-            <div class="detail-row"><div class="detail-lbl">入学年级</div><div class="detail-val">2025级</div></div>
+
+        <div class="info-list">
+            <div class="info-item"><div class="info-label">学校</div><div class="info-value">枣庄学院</div></div>
+            <div class="info-item"><div class="info-label">院系</div><div class="info-value">机电工程学院</div></div>
+            <div class="info-item"><div class="info-label">姓名</div><div class="info-value">鹿袁荣</div></div>
+            <div class="info-item"><div class="info-label">学号</div><div class="info-value">202515150121</div></div>
+            <div class="info-item"><div class="info-label">性别</div><div class="info-value">男</div></div>
+            <div class="info-item"><div class="info-label">入学年级</div><div class="info-value">2025级</div></div>
         </div>
-        <div class="bottom-btn-area"><button class="cert-btn">已认证</button></div>
+
+        <div class="submit-btn-wrap">
+            <button class="submit-btn">已认证</button>
+        </div>
     </div>
+
 </div>
 
 <script>
